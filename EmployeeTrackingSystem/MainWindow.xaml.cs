@@ -1,23 +1,32 @@
-﻿using System.Text;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace EmployeeTrackingSystem;
-
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
-public partial class MainWindow : Window
+namespace EmployeeTrackingSystem
 {
-    public MainWindow()
+    public partial class MainWindow : Window
     {
-        InitializeComponent();
+        private readonly EmployeeContext _context;
+
+        public MainWindow()
+        {
+            InitializeComponent();  // Initialize the XAML components
+            _context = App.ServiceProvider.GetService<EmployeeContext>();  // Get the database context
+            LoadEmployees();  // Load employees when the window opens
+        }
+
+        private void LoadEmployees()
+        {
+            var employees = _context.Employees.Include(e => e.Department).ToList();
+            EmployeeDataGrid.ItemsSource = employees;  // Bind employees to the DataGrid
+        }
+
+        private void OpenAddEmployeeWindow(object sender, RoutedEventArgs e)
+        {
+            var addEmployeeWindow = new AddEmployeeWindow(_context);  // Open the AddEmployeeWindow
+            addEmployeeWindow.ShowDialog();
+            LoadEmployees();  // Refresh the DataGrid after adding a new employee
+        }
     }
 }

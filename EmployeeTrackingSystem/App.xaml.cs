@@ -1,29 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.IO;
 using System.Windows;
-using Microsoft.Extensions.Configuration;
 
-public partial class App : Application
+namespace EmployeeTrackingSystem
 {
-    public static ServiceProvider ServiceProvider { get; private set; }
-
-    public App()
+    public partial class App : Application
     {
-        var serviceCollection = new ServiceCollection();
-        ConfigureServices(serviceCollection);
-        ServiceProvider = serviceCollection.BuildServiceProvider();
-    }
+        public static ServiceProvider ServiceProvider { get; private set; }
 
-    private void ConfigureServices(IServiceCollection services)
-    {
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
-            .Build();
+        public App()
+        {
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+            ServiceProvider = serviceCollection.BuildServiceProvider();
+        }
 
-        services.AddDbContext<EmployeeContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("EmployeeDB")));
+        private void ConfigureServices(IServiceCollection services)
+        {
+            services.AddDbContext<EmployeeContext>(options =>
+                options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=EmployeeDB;Trusted_Connection=True;"));
+        }
     }
 }
